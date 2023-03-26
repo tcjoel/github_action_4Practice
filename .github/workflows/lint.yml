@@ -1,7 +1,7 @@
-name: Deploy Project
+name: Deploy Lint
 on: [push, workflow_dispatch]
 jobs:
-    test:
+    lint:
       runs-on: ubuntu-latest
       steps:
         - name: Get code
@@ -14,7 +14,33 @@ jobs:
           run: npm ci
         - name: Run lint
           run: npm run lint
+    test:
+      needs: lint
+      runs-on: ubuntu-latest
+      steps:
+        - name: Get code
+          uses: actions/checkout@v3
+        - name: Install NodeJS
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18
+        - name: Install dependencies
+          run: npm ci
         - name: Run tests
           run: npm test
+    deploy:
+      needs: test
+      runs-on: ubuntu-latest
+      steps:
+        - name: Get code
+          uses: actions/checkout@v3
+        - name: Install NodeJS
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18
+        - name: Install dependencies
+          run: npm ci
         - name: Run build
           run: npm run build
+        - name: deploy
+          run: echo "the deployment is successful"
